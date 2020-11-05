@@ -8,8 +8,6 @@ import 'package:filesize/filesize.dart';
 import 'package:skynet_send/config.dart';
 
 class DownloadTask {
-  CipherWithAppendedMac cipher;
-  SecretKey secretKey;
   Map chunkIndex;
   Map metadata;
 
@@ -23,19 +21,7 @@ class DownloadTask {
 
     final cryptParts = base64.decode(key);
 
-    cipher = CipherWithAppendedMac(aesCtr, Hmac(sha256));
-
-    secretKey = SecretKey(cryptParts.sublist(0, 32));
-
-    final nonce = Nonce(cryptParts.sublist(32, 32 + 16));
-
-    final decryptedChunkIndex = await cipher.decrypt(
-      res.bodyBytes,
-      secretKey: secretKey,
-      nonce: nonce,
-    );
-
-    chunkIndex = json.decode(utf8.decode(decryptedChunkIndex));
+    chunkIndex = json.decode(utf8.decode(res.bodyBytes));
 
     // print(chunkIndex);
 
@@ -74,12 +60,10 @@ class DownloadTask {
 
       // print('dl $currentI');
 
-      final chunkNonce = Nonce(
-          base64.decode(chunkIndex['chunkNonces'][(currentI + 1).toString()]));
+    
 
       downloadAndDecryptChunk(
         chunkSkylink: chunkSkylink,
-        chunkNonce: chunkNonce,
         currentI: currentI,
       );
 
@@ -97,7 +81,6 @@ class DownloadTask {
 
   void downloadAndDecryptChunk({
     String chunkSkylink,
-    Nonce chunkNonce,
     final int currentI,
   }) async {
     while (true) {
@@ -108,18 +91,13 @@ class DownloadTask {
 
         //  print('dcrypt $currentI');
 
-        final decryptedChunk = await cipher.decrypt(
-          chunkRes.bodyBytes,
-          secretKey: secretKey,
-          nonce: chunkNonce,
-        );
 
         while (chunksLength < currentI) {
           await Future.delayed(Duration(milliseconds: 20));
         }
         //  print('done $currentI');
 
-        chunkCtrl.add(decryptedChunk);
+        chunkCtrl.add(chunk.bodyBytes);
         chunksLength++;
 
         if (currentI == totalChunks - 1) {
