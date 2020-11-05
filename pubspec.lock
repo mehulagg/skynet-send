@@ -169,15 +169,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.5"
-  cryptography:
-    dependency: "direct main"
-    description:
-      path: cryptography
-      ref: web-key-fix
-      resolved-ref: "46b6e5d3872c3e777767ab95189fb801d0e8ce91"
-      url: "https://github.com/CDDelta/cryptography/"
-    source: git
-    version: "1.4.1"
   dart_style:
     dependency: transitive
     description:

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:cryptography/cryptography.dart';
 import 'package:filesize/filesize.dart';
 
 import 'package:skynet_send/const.dart';
@@ -67,7 +66,6 @@ void main() async {
 
     await dlTask.downloadAndDecryptMetadata(
       skylink,
-      key,
     );
 
     querySelector('#download-filename')
@@ -183,18 +181,8 @@ void encryptAndUpload(
   querySelector('.upload-section').style.display = 'none';
   querySelector('.upload-section-active').style.display = '';
 
-  setState('Encrypting and uploading file...');
+  setState('Uploading file...');
   // print(file.type);
-
-  // Choose the cipher
-  final cipher = CipherWithAppendedMac(aesCtr, Hmac(sha256));
-
-  // Choose some 256-bit secret key
-  final secretKey = SecretKey.randomBytes(32);
-
-  // Choose some unique (non-secret) nonce (max 16 bytes).
-  // The same (secretKey, nonce) combination should not be used twice!
-  final nonce = Nonce.randomBytes(16);
 
   final totalChunks = (file.size / (chunkSize + 32)).abs().toInt() + 1;
 
@@ -220,8 +208,7 @@ void encryptAndUpload(
     setState(event);
   });
 
-  final stream =
-      task.encryptStreamInBlocks(getStreamOfFile(file), cipher, secretKey);
+  final stream = getStreamOfFile(file);
 
   final chunkSkylinks = await task.uploadChunkedStreamToSkynet(
       file.size, stream /* .asBroadcastStream() */
@@ -230,17 +217,12 @@ void encryptAndUpload(
 
   print(chunkSkylinks);
 
-  setState('Encrypting and uploading chunk index...');
+  setState('Uploading chunk index...');
 
-  final links = await cipher.encrypt(
-    utf8.encode(json.encode({
-      'chunks': chunkSkylinks,
-      'chunkNonces': task.chunkNonces,
-      'metadata': metadata,
-    })),
-    secretKey: secretKey,
-    nonce: nonce,
-  );
+  final links = await utf8.encode(json.encode({
+    'chunks': chunkSkylinks,
+    'metadata': metadata,
+  }));
 
   String skylink;
 
@@ -256,13 +238,8 @@ void encryptAndUpload(
     }
   }
 
-  // Encrypt
-
-  final secret =
-      base64.encode([...(await secretKey.extract()), ...nonce.bytes]);
-
   final link =
-      '${window.location.protocol}//${window.location.host}${window.location.pathname}#b-$skylink+$secret';
+      '${window.location.protocol}//${window.location.host}${window.location.pathname}#b-$skylink+';
 
   querySelector('.upload-section-active').style.display = 'none';
   querySelector('#upload-instruction').style.display = 'none';

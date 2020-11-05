@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cryptography/cryptography.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:typed_data';
@@ -20,7 +19,7 @@ class DownloadTask {
 
     chunkIndex = json.decode(utf8.decode(res.bodyBytes));
 
-    // print(chunkIndex);
+    // print("chunkIndex: $chunkIndex");
 
     metadata = chunkIndex['metadata'];
 
@@ -50,14 +49,12 @@ class DownloadTask {
 
     //   querySelector('.upload-section-active').style.display = '';
 
-    setDLState('Downloading and decrypting chunk 1 of $totalChunks...');
+    setDLState('Downloading chunk 1 of $totalChunks...');
 
     for (final chunkSkylink in chunkIndex['chunks']) {
       final currentI = i;
 
-      // print('dl $currentI');
-
-    
+      //  print('dl $currentI');
 
       downloadAndDecryptChunk(
         chunkSkylink: chunkSkylink,
@@ -66,7 +63,7 @@ class DownloadTask {
 
       await Future.delayed(Duration(milliseconds: 100));
 
-      while (i > iDone + 4) {
+      while (i > iDone + 5) {
         await Future.delayed(Duration(milliseconds: 20));
       }
 
@@ -86,13 +83,10 @@ class DownloadTask {
           '${SkynetConfig.dlPortal}/$chunkSkylink',
         );
 
-        //  print('dcrypt $currentI');
-
-
         while (chunksLength < currentI) {
           await Future.delayed(Duration(milliseconds: 20));
         }
-        //  print('done $currentI');
+        // print('done $currentI');
 
         chunkCtrl.add(chunkRes.bodyBytes);
         chunksLength++;
@@ -101,8 +95,7 @@ class DownloadTask {
           chunkCtrl.add(null);
           return;
         } else {
-          setDLState(
-              'Downloading and decrypting chunk ${currentI + 2} of $totalChunks...');
+          setDLState('Downloading chunk ${currentI + 2} of $totalChunks...');
         }
         iDone++;
 

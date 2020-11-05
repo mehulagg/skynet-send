@@ -20,8 +20,8 @@ void main(List<String> args) async {
     String hash = args[1];
 
     hash = hash.substring(hash.indexOf('#') + 1);
-/* 
-    print(hash); */
+
+    print(hash);
 
     if (hash.startsWith(RegExp(r'[0-9]'))) {
       print('Unsupported version. Please use the Web UI.');
@@ -39,16 +39,18 @@ void main(List<String> args) async {
       return;
     }
 
-    hash = hash.substring(lengthSep + 1);
+    final skylink = hash.substring(lengthSep + 1);
+    // print("hash: $hash");
 
-    final sep = hash.indexOf('+');
+    // final sep = hash.indexOf('+');
+    // print("sep: $sep");
 
-    final skylink = hash.substring(0, sep);
-    final key = hash.substring(sep + 1);
+    // final skylink = hash.substring(0, sep);
+
 /* 
     print(skylink);
     print(key); */
-    // print(skylink);
+    // print("skylink: $skylink");
 
     final dlTask = DownloadTask();
 

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:cryptography/cryptography.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:path/path.dart' as p;
@@ -18,16 +17,6 @@ void startEncryptAndUpload(
 
   print('uploading file...');
   // print(file.type);
-
-  // Choose the cipher
-  // final cipher = CipherWithAppendedMac(aesCtr, Hmac(sha256));
-
-  // Choose some 256-bit secret key
-  // final secretKey = SecretKey.randomBytes(32);
-
-  // Choose some unique (non-secret) nonce (max 16 bytes).
-  // The same (secretKey, nonce) combination should not be used twice!
-  // final nonce = Nonce.randomBytes(16);
 
   final totalChunks = (file.lengthSync() / (chunkSize + 32)).abs().toInt() + 1;
 
@@ -55,19 +44,17 @@ void startEncryptAndUpload(
     print(event);
   });
 
-  final stream = 
-      getStreamOfIOFile(file.openRead());
+  final stream = getStreamOfIOFile(file.openRead());
 
   final chunkSkylinks =
       await task.uploadChunkedStreamToSkynet(file.lengthSync(), stream);
 
   print('uploading chunk index...');
 
-  final links = await
-    utf8.encode(json.encode({
-      'chunks': chunkSkylinks,
-      'metadata': metadata,
-    }));
+  final links = await utf8.encode(json.encode({
+    'chunks': chunkSkylinks,
+    'metadata': metadata,
+  }));
 
   String skylink;
 

@@ -4,7 +4,6 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
-import 'package:cryptography/cryptography.dart';
 import 'package:skynet_send/const.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http_parser/http_parser.dart';
@@ -31,7 +30,6 @@ class EncryptionUploadTask {
 
   final progress = StreamController<String>.broadcast();
 
-
   Future<List<String>> uploadChunkedStreamToSkynet(
       int fileSize, Stream<List<int>> byteUploadStream) async {
     final totalChunks = (fileSize / (chunkSize + 32)).abs().toInt() + 1;
@@ -41,11 +39,11 @@ class EncryptionUploadTask {
     final uploaderFileId = Uuid().v4();
     //  print('send $uploaderFileId');
 
-    setState('Encrypting and uploading file... (Chunk 1 of $totalChunks)');
+    setState('Uploading file... (Chunk 1 of $totalChunks)');
 
     List<String> skylinks = List.generate(totalChunks, (index) => null);
 
-    _uploadChunk(final Uint8List chunk, final int currentI) async {
+    _uploadChunk(final List<int> chunk, final int currentI) async {
       // print('_uploadChunk $currentI');
 
       String skylink;
@@ -67,10 +65,9 @@ class EncryptionUploadTask {
       skylinks[currentI] = skylink;
       i++;
 
-      setState(
-          'Encrypting and uploading file... ($i/$totalChunks Chunks done)');
+      setState('Uploading file... ($i/$totalChunks Chunks done)');
 /*     setState(
-        'Encrypting and uploading file... $i/$totalChunks Chunks uploaded (16 MB each)'); */
+        'Uploading file... $i/$totalChunks Chunks uploaded (16 MB each)'); */
     }
 
     int internalI = 0;
@@ -81,7 +78,7 @@ class EncryptionUploadTask {
 
       _uploadChunk(chunk, internalI);
 
-      while (i < internalI - 2) {
+      while (i < internalI - 3) {
         await Future.delayed(Duration(milliseconds: 20));
       }
       internalI++;
