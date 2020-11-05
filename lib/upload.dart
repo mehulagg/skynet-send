@@ -89,7 +89,7 @@ void startEncryptAndUpload(
   final secret =
       base64.encode([...(await secretKey.extract()), ...nonce.bytes]);
 
-  final link = 'https://skynet-send.hns.siasky.net/#b-$skylink+$secret';
+  final link = 'https://skynet-send.hns.siasky.net/#b-$skylink';
 
   print('Secure Download Link for ${greenBold(metadata['filename'])}: $link');
 }
