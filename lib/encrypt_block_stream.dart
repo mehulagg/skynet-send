@@ -25,7 +25,9 @@ String getRandomPortal() {
 class EncryptionUploadTask {
   int i = 0;
 
-  
+  void setState(String s) {
+    progress.add(s);
+  }
 
   final progress = StreamController<String>.broadcast();
 
