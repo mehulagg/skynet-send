@@ -58,7 +58,6 @@ void main(List<String> args) async {
 
     await dlTask.downloadAndDecryptMetadata(
       skylink,
-      key,
     );
 
     print(
