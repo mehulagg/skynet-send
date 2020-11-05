@@ -15,7 +15,7 @@ List<String> publicPortals = [
   // 'https://sialoop.net',// NO CORS
   // 'https://skydrain.net', // SLOW
   // 'https://siacdn.com',// NO CORS
-  'https://skynethub.io', // FAST and CORS
+  // 'https://skynethub.io', // FAST and CORS
 ];
 
 String getRandomPortal() {
@@ -25,40 +25,10 @@ String getRandomPortal() {
 class EncryptionUploadTask {
   int i = 0;
 
-  Map<String, String> chunkNonces = {};
-
-  void setState(String s) {
-    progress.add(s);
-  }
+  
 
   final progress = StreamController<String>.broadcast();
 
-  Stream<List<int>> encryptStreamInBlocks(Stream<List<int>> source,
-      CipherWithAppendedMac cipher, SecretKey secretKey) async* {
-    i = 0;
-    int internalI = 0;
-
-    chunkNonces = {};
-
-    // Wait until a new chunk is available, then process it.
-    await for (var chunk in source) {
-      // print('crypt $internalI');
-      internalI++;
-      while (i < internalI - 3) {
-        await Future.delayed(Duration(milliseconds: 20));
-      }
-
-      final chunkNonce = Nonce.randomBytes(16);
-      chunkNonces[internalI.toString()] = base64.encode(chunkNonce.bytes);
-
-      yield await cipher.encrypt(
-        chunk,
-        secretKey: secretKey,
-        nonce: chunkNonce,
-      );
-    }
-    // print('done');
-  }
 
   Future<List<String>> uploadChunkedStreamToSkynet(
       int fileSize, Stream<List<int>> byteUploadStream) async {
