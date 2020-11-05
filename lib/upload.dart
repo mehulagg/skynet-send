@@ -66,7 +66,6 @@ void startEncryptAndUpload(
   final links = await
     utf8.encode(json.encode({
       'chunks': chunkSkylinks,
-      'chunkNonces': task.chunkNonces,
       'metadata': metadata,
     }));
 
@@ -83,11 +82,6 @@ void startEncryptAndUpload(
       print('retry');
     }
   }
-
-  // Encrypt
-
-  final secret =
-      base64.encode([...(await secretKey.extract()), ...nonce.bytes]);
 
   final link = 'https://skynet-send.hns.siasky.net/#b-$skylink';
 
