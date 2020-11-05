@@ -97,7 +97,7 @@ class DownloadTask {
         }
         //  print('done $currentI');
 
-        chunkCtrl.add(chunk.bodyBytes);
+        chunkCtrl.add(chunkRes.bodyBytes);
         chunksLength++;
 
         if (currentI == totalChunks - 1) {
