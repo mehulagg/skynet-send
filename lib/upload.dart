@@ -16,18 +16,18 @@ void startEncryptAndUpload(
 ) async {
   print('Upload portals: ${publicPortals}');
 
-  print('Encrypting and uploading file...');
+  print('uploading file...');
   // print(file.type);
 
   // Choose the cipher
-  final cipher = CipherWithAppendedMac(aesCtr, Hmac(sha256));
+  // final cipher = CipherWithAppendedMac(aesCtr, Hmac(sha256));
 
   // Choose some 256-bit secret key
-  final secretKey = SecretKey.randomBytes(32);
+  // final secretKey = SecretKey.randomBytes(32);
 
   // Choose some unique (non-secret) nonce (max 16 bytes).
   // The same (secretKey, nonce) combination should not be used twice!
-  final nonce = Nonce.randomBytes(16);
+  // final nonce = Nonce.randomBytes(16);
 
   final totalChunks = (file.lengthSync() / (chunkSize + 32)).abs().toInt() + 1;
 
@@ -55,23 +55,20 @@ void startEncryptAndUpload(
     print(event);
   });
 
-  final stream = task.encryptStreamInBlocks(
-      getStreamOfIOFile(file.openRead()), cipher, secretKey);
+  final stream = 
+      getStreamOfIOFile(file.openRead());
 
   final chunkSkylinks =
       await task.uploadChunkedStreamToSkynet(file.lengthSync(), stream);
 
-  print('Encrypting and uploading chunk index...');
+  print('uploading chunk index...');
 
-  final links = await cipher.encrypt(
+  final links = await
     utf8.encode(json.encode({
       'chunks': chunkSkylinks,
       'chunkNonces': task.chunkNonces,
       'metadata': metadata,
-    })),
-    secretKey: secretKey,
-    nonce: nonce,
-  );
+    }));
 
   String skylink;
 
