@@ -15,11 +15,8 @@ class DownloadTask {
 
   Future<void> downloadAndDecryptMetadata(
     String skylink,
-    String key,
   ) async {
     final res = await http.get('${SkynetConfig.dlPortal}/$skylink');
-
-    final cryptParts = base64.decode(key);
 
     chunkIndex = json.decode(utf8.decode(res.bodyBytes));
 
